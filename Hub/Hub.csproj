@@ -9,4 +9,10 @@
     <ProjectReference Include="..\AgentProto\AgentProto.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Update="Corallite %281%29">
+      <HintPath>..\..\..\Users\k\Downloads\Corallite (1).dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

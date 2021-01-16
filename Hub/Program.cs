@@ -1,4 +1,4 @@
-﻿using System;
+﻿using AgentProto;
 
 namespace Hub
 {
@@ -6,7 +6,13 @@ namespace Hub
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var config = new Config();
+            var fs = new Fs(config);
+            var hub = new AgentProto.Hub(config, fs);
+     
+           hub.StartListening();
+
+        
         }
     }
 }

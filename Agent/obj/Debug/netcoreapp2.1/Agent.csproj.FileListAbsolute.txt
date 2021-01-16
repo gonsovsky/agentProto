@@ -1,0 +1,14 @@
+C:\SoftConsult\AgentProto\Agent\bin\Debug\netcoreapp2.1\Agent.deps.json
+C:\SoftConsult\AgentProto\Agent\bin\Debug\netcoreapp2.1\Agent.runtimeconfig.json
+C:\SoftConsult\AgentProto\Agent\bin\Debug\netcoreapp2.1\Agent.runtimeconfig.dev.json
+C:\SoftConsult\AgentProto\Agent\bin\Debug\netcoreapp2.1\Agent.dll
+C:\SoftConsult\AgentProto\Agent\bin\Debug\netcoreapp2.1\Agent.pdb
+C:\SoftConsult\AgentProto\Agent\bin\Debug\netcoreapp2.1\AgentProto.dll
+C:\SoftConsult\AgentProto\Agent\bin\Debug\netcoreapp2.1\AgentProto.pdb
+C:\SoftConsult\AgentProto\Agent\obj\Debug\netcoreapp2.1\Agent.csprojAssemblyReference.cache
+C:\SoftConsult\AgentProto\Agent\obj\Debug\netcoreapp2.1\Agent.csproj.CoreCompileInputs.cache
+C:\SoftConsult\AgentProto\Agent\obj\Debug\netcoreapp2.1\Agent.AssemblyInfoInputs.cache
+C:\SoftConsult\AgentProto\Agent\obj\Debug\netcoreapp2.1\Agent.AssemblyInfo.cs
+C:\SoftConsult\AgentProto\Agent\obj\Debug\netcoreapp2.1\Agent.csproj.CopyComplete
+C:\SoftConsult\AgentProto\Agent\obj\Debug\netcoreapp2.1\Agent.dll
+C:\SoftConsult\AgentProto\Agent\obj\Debug\netcoreapp2.1\Agent.pdb

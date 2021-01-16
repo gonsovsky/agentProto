@@ -1,0 +1,14 @@
+C:\SoftConsult\AgentProto\Hub\obj\Debug\netcoreapp2.1\Hub.csprojAssemblyReference.cache
+C:\SoftConsult\AgentProto\Hub\obj\Debug\netcoreapp2.1\Hub.csproj.CoreCompileInputs.cache
+C:\SoftConsult\AgentProto\Hub\obj\Debug\netcoreapp2.1\Hub.AssemblyInfoInputs.cache
+C:\SoftConsult\AgentProto\Hub\obj\Debug\netcoreapp2.1\Hub.AssemblyInfo.cs
+C:\SoftConsult\AgentProto\Hub\bin\Debug\netcoreapp2.1\Hub.deps.json
+C:\SoftConsult\AgentProto\Hub\bin\Debug\netcoreapp2.1\Hub.runtimeconfig.json
+C:\SoftConsult\AgentProto\Hub\bin\Debug\netcoreapp2.1\Hub.runtimeconfig.dev.json
+C:\SoftConsult\AgentProto\Hub\bin\Debug\netcoreapp2.1\Hub.dll
+C:\SoftConsult\AgentProto\Hub\bin\Debug\netcoreapp2.1\Hub.pdb
+C:\SoftConsult\AgentProto\Hub\bin\Debug\netcoreapp2.1\AgentProto.dll
+C:\SoftConsult\AgentProto\Hub\bin\Debug\netcoreapp2.1\AgentProto.pdb
+C:\SoftConsult\AgentProto\Hub\obj\Debug\netcoreapp2.1\Hub.csproj.CopyComplete
+C:\SoftConsult\AgentProto\Hub\obj\Debug\netcoreapp2.1\Hub.dll
+C:\SoftConsult\AgentProto\Hub\obj\Debug\netcoreapp2.1\Hub.pdb
