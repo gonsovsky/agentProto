@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace AgentProto
@@ -7,56 +9,50 @@ namespace AgentProto
     {
         public byte Command;
         public byte Status;
-        public ulong Start;
-        public ulong Length;
-        public ushort UrlLength;
+        public long Start;
+        public long Length;
+        public short UrlLength;
         public byte[] UrlData;
 
-        public string Url => Encoding.UTF8.GetString(UrlData);
-
-        public bool Ready => Status == 0;
-
-        public ProtoGram(byte command, ulong start, ulong len, string uri)
+        public ProtoGram(byte command, long start, long len, string uri)
         {
             Command = command;
             Start = start;
             Length = len;
-            UrlLength = (ushort)uri.Length;
+            UrlLength = (short)uri.Length;
             UrlData = Encoding.UTF8.GetBytes(uri);
             Status = 0;
         }
 
-        public MemoryStream ToStream()
+        public int Size => Config.GramSize + UrlLength;
+
+        public void ToByteArray(ref byte[] target)
         {
-            var ms = new MemoryStream();
-            using (var writer = new BinaryWriter(ms))
+            using (var ms = new MemoryStream(target,true))
             {
-                writer.Write(Command);
-                writer.Write(Status);
-                writer.Write(Start);
-                writer.Write(Length);
-                writer.Write(UrlLength);
-                writer.Write(UrlData);
+                using (var writer = new BinaryWriter(ms))
+                {
+                    writer.Write(Command);
+                    writer.Write(Status);
+                    writer.Write(Start);
+                    writer.Write(Length);
+                    writer.Write(UrlLength);
+                    writer.Write(UrlData);
+                }
             }
-            return ms;
         }
 
-        public byte[] ToByteArray()
+        public static ProtoGram FromByteArray(byte[] bytes)
         {
-            return ToStream().ToArray();
-        }
-
-        public static ProtoGram FromStream(Stream stream)
-        {
-            using (var reader = new BinaryReader(stream))
+            using (var reader = new BinaryReader(new MemoryStream(bytes)))
             {
                 var res = new ProtoGram
                 {
                     Command = reader.ReadByte(),
                     Status = reader.ReadByte(),
-                    Start = reader.ReadUInt64(),
-                    Length = reader.ReadUInt64(),
-                    UrlLength = reader.ReadUInt16()
+                    Start = reader.ReadInt64(),
+                    Length = reader.ReadInt64(),
+                    UrlLength = reader.ReadInt16()
                 };
                 res.UrlData = reader.ReadBytes(res.UrlLength);
                 return res;
@@ -68,5 +64,11 @@ namespace AgentProto
     {
         Get = 0x1,
         List = 0x2
+    }
+
+    public enum ProtoStatus
+    {
+        Success = 0x1,
+        Error = 0x2
     }
 }

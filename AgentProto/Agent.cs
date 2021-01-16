@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -6,108 +7,88 @@ using System.Threading;
 
 namespace AgentProto
 {
-    public class Agent
+    public class Agent: ProtoParty
     {
-        protected Config Config;
-
-        protected Fs Fs;
-
-        public Agent(Config config, Fs fs)
-        {
-            Config = config;
-            Fs = fs;
-        }
-
         protected readonly ManualResetEvent ConnectDone =
             new ManualResetEvent(false);
 
         protected readonly ManualResetEvent SendDone =
             new ManualResetEvent(false);
 
-        protected readonly ManualResetEvent ReceiveDone =
-            new ManualResetEvent(false);
-
-        protected string Response = String.Empty;
-
-        public void Get(string uri, ulong start, ulong len)
+        public void Get(string uri, long start, long len, string file="")
         {
+            if (file == "")
+                file = uri;
+            var state = new AgentState(Config, Fs)
+            {
+                FileName = file,
+                Gram = new ProtoGram((byte)ProtoCommand.Get, start, len, uri)
+            };
             try
             {
                 var ipHostInfo = Dns.GetHostEntry(Config.Host);
                 var ipAddress = ipHostInfo.AddressList
                     .First(ip => ip.AddressFamily == AddressFamily.InterNetwork);
                 var remoteEp = new IPEndPoint(ipAddress, Config.Port);
-
                 var client = new Socket(ipAddress.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
-
-                var state = new AgentState(Config, Fs) {WorkSocket = client, Gram = new ProtoGram(1, start, len, uri)};
-
-                client.BeginConnect(remoteEp,
-                    ConnectCallback, client);
+                state.WorkSocket = client;
+                client.BeginConnect(remoteEp, ConnectCallback, state);
                 ConnectDone.WaitOne();
-
-                Send(client, state.Gram);
+                Send(state, state.Gram);
                 SendDone.WaitOne();
-
                 Receive(state);
-                ReceiveDone.WaitOne();
-
-                client.Shutdown(SocketShutdown.Both);
-                client.Close();
-
+                AllDone.WaitOne();
+                Complete(state);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Abort(state, e);
             }
+        }
+
+        public List<FsInfo> List(string uri)
+        {
+            return null;
         }
 
         private void ConnectCallback(IAsyncResult ar)
         {
+            var state = (AgentState)ar.AsyncState;
             try
             {
-                var client = (Socket) ar.AsyncState;
-
-                client.EndConnect(ar);
-
-                Console.WriteLine("Socket connected to {0}",
-                    client.RemoteEndPoint);
-
+                state.WorkSocket.EndConnect(ar);
                 ConnectDone.Set();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Abort(state, e);
             }
         }
 
-        private void Send(Socket client, ProtoGram gram)
+        private void Send(AgentState state, ProtoGram gram)
         {
-            var byteData = gram.ToByteArray();
-
-            client.BeginSend(byteData, 0, byteData.Length, 0,
-                SendCallback, client);
+            state.Send();
+            state.WorkSocket.BeginSend(state.Buffer, 0, state.BufferLen, 0,
+                SendCallback, state);
         }
 
         private void SendCallback(IAsyncResult ar)
         {
+            var state = (AgentState)ar.AsyncState;
             try
             {
-                var client = (Socket) ar.AsyncState;
-
-                var bytesSent = client.EndSend(ar);
-                Console.WriteLine("Sent {0} bytes to server.", bytesSent);
-
+                var bytesSent = state.WorkSocket.EndSend(ar);
                 SendDone.Set();
+                OnRequest?.Invoke(this, state);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Abort(state, e);
             }
         }
 
-        private void Receive(AgentState state)
+        private void Receive(ProtoState state)
         {
             try
             {
@@ -116,36 +97,43 @@ namespace AgentProto
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Abort(state, e);
             }
         }
 
         private void ReceiveCallback(IAsyncResult ar)
         {
+            var state = (AgentState)ar.AsyncState;
             try
             {
-                var state = (AgentState)ar.AsyncState;
                 var client = state.WorkSocket;
-
                 var bytesRead = client.EndReceive(ar);
-
                 if (bytesRead > 0)
                 {
-                    state.Receive(state.Buffer, bytesRead);
-
+                    state.Receive(bytesRead);
                     client.BeginReceive(state.Buffer, 0, Config.BufferSize, 0,
                         ReceiveCallback, state);
                 }
                 else
                 {
-                    state.Complete();
-                    ReceiveDone.Set();
+                    AllDone.Set();
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Abort(state, e);
             }
+        }
+
+        public Agent(Config config, IFs fs) : base(config, fs)
+        {
+        }
+
+        public override void Abort(ProtoState state, Exception e)
+        {
+            this.ConnectDone.Set();
+            this.SendDone.Set();
+            base.Abort(state, e);
         }
     }
 }

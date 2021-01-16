@@ -4,18 +4,31 @@ namespace AgentProto
 {
     public class AgentState: ProtoState
     {
-        public AgentState(Config config, Fs fs) : base(config, fs)
+        public AgentState(Config config, IFs fs) : base(config, fs)
         {
+
         }
 
-        public override bool Receive(byte[] data, int len)
+        public override bool Receive(int len)
         {
+            var headDelta=0;
+            if (!HeadRecv)
+            {
+                HeadRecv = true;
+                if (BufferLen < Config.GramSize)
+                    return false;
+                Gram = ProtoGram.FromByteArray(Buffer);
+                headDelta = Gram.Size;
+            }
             if (File == null)
             {
-                File = Fs.Put(Gram.Url);
+                File = Fs.Put(FileName);
             }
-            File.Write(data, 0, len);
+            File.Write(Buffer, headDelta, len- headDelta);
             return true;
         }
+
+        public string FileName;
+
     }
 }

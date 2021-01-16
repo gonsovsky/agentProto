@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Sockets;
+using System.Text;
 using Corallite.Buffers;
 
 namespace AgentProto
@@ -9,9 +10,9 @@ namespace AgentProto
     {
         protected Config Config;
 
-        protected Fs Fs;
+        protected IFs Fs;
 
-        protected ProtoState(Config config, Fs fs)
+        protected ProtoState(Config config, IFs fs)
         {
             Config = config;
             Fs = fs;
@@ -20,19 +21,48 @@ namespace AgentProto
 
         public byte[] Buffer;
 
+        public int BufferLen;
+
         public FileStream File;
 
         public Socket WorkSocket = null;
 
         public ProtoGram Gram;
 
-        public abstract bool Receive(byte[] data, int len);
+        public abstract bool Receive(int len);
 
-        public bool Complete()
+        public virtual void Complete()
         {
-            Fs.Release(Gram.Url, File);
-            Console.WriteLine("Complete: " + Gram.Url);
-            return true;
+            WorkSocket?.Shutdown(SocketShutdown.Both);
+            WorkSocket?.Close();
+            WorkSocket = null;
+            if (Buffer != null)
+                UniArrayPool<byte>.Shared.Return(Buffer);
+            Buffer = null;
+            if (File != null)
+                Fs.Release(File);
+            File = null;
         }
+
+        public virtual void Abort(Exception e)
+        {
+            Complete();
+        }
+
+        public bool HeadSent;
+
+        public bool HeadRecv;
+
+        public virtual void Send()
+        {
+            if (HeadSent)
+                return;
+            HeadSent = true;
+            Gram.ToByteArray(ref Buffer);
+            BufferLen = Gram.Size;
+        }
+
+        public string Url => Encoding.UTF8.GetString(Gram.UrlData);
+
     }
 }

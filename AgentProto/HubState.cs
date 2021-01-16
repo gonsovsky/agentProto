@@ -4,43 +4,29 @@ namespace AgentProto
 {
     public class HubState: ProtoState
     {
-        public MemoryStream Recv = new MemoryStream();
-
-        public override bool Receive(byte[] data, int len)
+        public override bool Receive(int len)
         {
-            Recv.Write(Buffer, 0, len);
-            Recv.Position = 0;
-            try
-            {
-                if (Recv.Length >= Config.GramSize)
-                {
-                    Gram = ProtoGram.FromStream(Recv);
-                    if (Gram.Ready)
-                    {
-                        File = Fs.Get(Gram.Url, Gram.Start, Gram.Length);
-                        Recv = new MemoryStream();
-                        return true;
-                    }
-                }
-            }
-            finally
-            {
-                Recv.Position = Recv.Length;
-            }
-            
-            return false;
+            BufferLen += len;
+            if (BufferLen < Config.GramSize)
+                return false;
+            Gram = ProtoGram.FromByteArray(Buffer);
+            File = Fs.Get(Url, Gram.Start, Gram.Length);
+            FileLength = this.Gram.Length != 0 ? this.Gram.Length : File.Length;
+      
+            return true;
         }
 
-        public void Send()
+        public long FileLength;
+
+        public override void Send()
         {
-            this.Buffer = new byte[Config.BufferSize];
-            BufferLen = File.Read(this.Buffer, 0, Config.BufferSize);
+            BufferLen = 0;
+            base.Send();
+            BufferLen += File.Read(this.Buffer, BufferLen, Config.BufferSize- BufferLen);
         }
 
-        public HubState(Config config, Fs fs) : base(config, fs)
+        public HubState(Config config, IFs fs) : base(config, fs)
         {
         }
-
-        public int BufferLen;
     }
 }

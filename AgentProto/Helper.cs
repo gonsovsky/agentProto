@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -14,6 +15,21 @@ namespace AgentProto
 
             return fields.Select(f => f.FieldType)
                 .Select(x => x.IsPrimitive ? Marshal.SizeOf(x) : SizeOf(x)).Sum();
+        }
+
+        public static void Combine(string inputDirectoryPath, string inputFileNamePattern, string outputFilePath)
+        {
+            string[] inputFilePaths = Directory.GetFiles(inputDirectoryPath, inputFileNamePattern);
+            using (var outputStream = File.Create(outputFilePath))
+            {
+                foreach (var inputFilePath in inputFilePaths)
+                {
+                    using (var inputStream = File.OpenRead(inputFilePath))
+                    {
+                        inputStream.CopyTo(outputStream);
+                    }
+                }
+            }
         }
 
         /*

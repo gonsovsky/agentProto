@@ -2,11 +2,12 @@
 {
     public class Config
     {
-        public readonly int GramSize = Helper.SizeOf(typeof(ProtoGram));
+        public static readonly int GramSize = Helper.SizeOf(typeof(ProtoGram));
 
+        /// <summary>
+        /// Размер буфера должен вмещать протограмму с URL
+        /// </summary>
         public readonly int BufferSize = 1024;
-
-        public readonly int Delay = 1;
 
         public readonly int Port = 7777;
 
