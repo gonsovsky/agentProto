@@ -12,3 +12,4 @@ C:\SoftConsult\AgentProto\Agent\obj\Debug\netcoreapp2.1\Agent.AssemblyInfo.cs
 C:\SoftConsult\AgentProto\Agent\obj\Debug\netcoreapp2.1\Agent.csproj.CopyComplete
 C:\SoftConsult\AgentProto\Agent\obj\Debug\netcoreapp2.1\Agent.dll
 C:\SoftConsult\AgentProto\Agent\obj\Debug\netcoreapp2.1\Agent.pdb
+C:\SoftConsult\AgentProto\Agent\bin\Debug\netcoreapp2.1\Corallite.dll

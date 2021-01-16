@@ -6,10 +6,9 @@ namespace AgentProto
     {
         public MemoryStream Recv = new MemoryStream();
 
-        public FileStream Send;
-
-        public override bool Process()
+        public override bool Receive(byte[] data, int len)
         {
+            Recv.Write(Buffer, 0, len);
             Recv.Position = 0;
             try
             {
@@ -18,7 +17,7 @@ namespace AgentProto
                     Gram = ProtoGram.FromStream(Recv);
                     if (Gram.Ready)
                     {
-                        Send = Fs.Get(Gram.Url, Gram.Start, Gram.Length);
+                        File = Fs.Get(Gram.Url, Gram.Start, Gram.Length);
                         Recv = new MemoryStream();
                         return true;
                     }
@@ -32,13 +31,16 @@ namespace AgentProto
             return false;
         }
 
-        public override bool Complete()
+        public void Send()
         {
-            return true;
+            this.Buffer = new byte[Config.BufferSize];
+            BufferLen = File.Read(this.Buffer, 0, Config.BufferSize);
         }
 
         public HubState(Config config, Fs fs) : base(config, fs)
         {
         }
+
+        public int BufferLen;
     }
 }

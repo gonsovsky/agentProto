@@ -12,3 +12,4 @@ C:\SoftConsult\AgentProto\Hub\bin\Debug\netcoreapp2.1\AgentProto.pdb
 C:\SoftConsult\AgentProto\Hub\obj\Debug\netcoreapp2.1\Hub.csproj.CopyComplete
 C:\SoftConsult\AgentProto\Hub\obj\Debug\netcoreapp2.1\Hub.dll
 C:\SoftConsult\AgentProto\Hub\obj\Debug\netcoreapp2.1\Hub.pdb
+C:\SoftConsult\AgentProto\Hub\bin\Debug\netcoreapp2.1\Corallite.dll

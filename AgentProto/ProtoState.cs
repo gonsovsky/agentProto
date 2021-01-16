@@ -1,4 +1,8 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.IO;
+using System.Net.Sockets;
+using Corallite.Buffers;
+
 namespace AgentProto
 {
     public abstract class ProtoState
@@ -7,23 +11,28 @@ namespace AgentProto
 
         protected Fs Fs;
 
-        public ProtoState(Config config, Fs fs)
+        protected ProtoState(Config config, Fs fs)
         {
             Config = config;
             Fs = fs;
-            Buffer = new byte[Config.BufferSize];
-  
-            
+            Buffer = UniArrayPool<byte>.Shared.Rent(Config.BufferSize);
         }
 
         public byte[] Buffer;
+
+        public FileStream File;
 
         public Socket WorkSocket = null;
 
         public ProtoGram Gram;
 
-        public abstract bool Process();
+        public abstract bool Receive(byte[] data, int len);
 
-        public abstract bool Complete();
+        public bool Complete()
+        {
+            Fs.Release(Gram.Url, File);
+            Console.WriteLine("Complete: " + Gram.Url);
+            return true;
+        }
     }
 }

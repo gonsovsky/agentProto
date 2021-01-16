@@ -1,0 +1,11 @@
+C:\SoftConsult\AgentProto\AgentProto\obj\Debug\netstandard2.0\AgentProto.csprojAssemblyReference.cache
+C:\SoftConsult\AgentProto\AgentProto\obj\Debug\netstandard2.0\AgentProto.csproj.CoreCompileInputs.cache
+C:\SoftConsult\AgentProto\AgentProto\obj\Debug\netstandard2.0\AgentProto.AssemblyInfoInputs.cache
+C:\SoftConsult\AgentProto\AgentProto\obj\Debug\netstandard2.0\AgentProto.AssemblyInfo.cs
+C:\SoftConsult\AgentProto\AgentProto\bin\Debug\netstandard2.0\AgentProto.deps.json
+C:\SoftConsult\AgentProto\AgentProto\bin\Debug\netstandard2.0\AgentProto.dll
+C:\SoftConsult\AgentProto\AgentProto\bin\Debug\netstandard2.0\AgentProto.pdb
+C:\SoftConsult\AgentProto\AgentProto\bin\Debug\netstandard2.0\Corallite.dll
+C:\SoftConsult\AgentProto\AgentProto\obj\Debug\netstandard2.0\AgentProto.csproj.CopyComplete
+C:\SoftConsult\AgentProto\AgentProto\obj\Debug\netstandard2.0\AgentProto.dll
+C:\SoftConsult\AgentProto\AgentProto\obj\Debug\netstandard2.0\AgentProto.pdb

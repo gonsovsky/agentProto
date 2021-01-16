@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -28,14 +29,13 @@ namespace AgentProto
 
         protected string Response = String.Empty;
 
-        public void Get(string uri, ulong start, ulong len, string file=null)
+        public void Get(string uri, ulong start, ulong len)
         {
             try
             {
-                if (file == null)
-                    file = uri;
-                var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-                var ipAddress = ipHostInfo.AddressList[0];
+                var ipHostInfo = Dns.GetHostEntry(Config.Host);
+                var ipAddress = ipHostInfo.AddressList
+                    .First(ip => ip.AddressFamily == AddressFamily.InterNetwork);
                 var remoteEp = new IPEndPoint(ipAddress, Config.Port);
 
                 var client = new Socket(ipAddress.AddressFamily,
@@ -131,7 +131,7 @@ namespace AgentProto
 
                 if (bytesRead > 0)
                 {
-                    state.Process();
+                    state.Receive(state.Buffer, bytesRead);
 
                     client.BeginReceive(state.Buffer, 0, Config.BufferSize, 0,
                         ReceiveCallback, state);

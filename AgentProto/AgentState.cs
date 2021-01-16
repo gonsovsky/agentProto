@@ -8,23 +8,14 @@ namespace AgentProto
         {
         }
 
-        public override bool Process()
+        public override bool Receive(byte[] data, int len)
         {
-            if (RecvFile == null)
+            if (File == null)
             {
-                RecvFile = Fs.Put(Gram.Url);
+                File = Fs.Put(Gram.Url);
             }
-            RecvFile.Write(this.Buffer);
+            File.Write(data, 0, len);
             return true;
         }
-
-        public override bool Complete()
-        {
-            Fs.Release(Gram.Url, RecvFile);
-            return true;
-        }
-
-        public FileStream RecvFile;
-
     }
 }
