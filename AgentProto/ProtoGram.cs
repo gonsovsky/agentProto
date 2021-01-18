@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
+﻿using System.IO;
 using System.Text;
 
 namespace AgentProto
@@ -68,7 +66,7 @@ namespace AgentProto
 
     public enum ProtoStatus
     {
-        Success = 0x1,
-        Error = 0x2
+        Success = 0x0,
+        Error = 0x1
     }
 }

@@ -23,9 +23,9 @@ namespace AgentProto
 
         public int BufferLen;
 
-        public FileStream File;
+        public Stream File;
 
-        public Socket WorkSocket = null;
+        public Socket WorkSocket;
 
         public ProtoGram Gram;
 
@@ -42,6 +42,8 @@ namespace AgentProto
             if (File != null)
                 Fs.Release(File);
             File = null;
+            HeadRecv = false;
+            HeadSent = false;
         }
 
         public virtual void Abort(Exception e)
@@ -63,6 +65,5 @@ namespace AgentProto
         }
 
         public string Url => Encoding.UTF8.GetString(Gram.UrlData);
-
     }
 }

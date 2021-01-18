@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace AgentProto
+﻿namespace AgentProto
 {
     public class AgentState: ProtoState
     {

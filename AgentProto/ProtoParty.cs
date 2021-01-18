@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 
 namespace AgentProto
@@ -25,7 +22,7 @@ namespace AgentProto
         protected readonly ManualResetEvent AllDone =
             new ManualResetEvent(false);
 
-        public ProtoParty(Config config, IFs fs)
+        protected ProtoParty(Config config, IFs fs)
         {
             Config = config;
             Fs = fs;
@@ -34,7 +31,7 @@ namespace AgentProto
         public virtual void Abort(ProtoState state, Exception e)
         {
             state?.Abort(e);
-            AllDone.Set();
+            AllDone.Reset();
             OnAbort?.Invoke(this, state, e);
         }
 

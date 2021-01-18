@@ -3,12 +3,12 @@ using AgentProto;
 
 namespace Hub
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main()
         {
             var config = new Config();
-            var fs = new Fs(config);
+            var fs = new StubFs(config);
             var hub = new AgentProto.Hub(config, fs)
             {
                 OnRequest = (party, state) =>
@@ -24,7 +24,6 @@ namespace Hub
                     Console.WriteLine($"Hub Abort   : {ex.Message}");
                 }
             };
-
             hub.Listen();
         }
     }

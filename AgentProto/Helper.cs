@@ -17,9 +17,8 @@ namespace AgentProto
                 .Select(x => x.IsPrimitive ? Marshal.SizeOf(x) : SizeOf(x)).Sum();
         }
 
-        public static void Combine(string inputDirectoryPath, string inputFileNamePattern, string outputFilePath)
+        public static void Combine(string inputDirectoryPath, string[] inputFilePaths, string outputFilePath)
         {
-            string[] inputFilePaths = Directory.GetFiles(inputDirectoryPath, inputFileNamePattern);
             using (var outputStream = File.Create(outputFilePath))
             {
                 foreach (var inputFilePath in inputFilePaths)
@@ -29,6 +28,17 @@ namespace AgentProto
                         inputStream.CopyTo(outputStream);
                     }
                 }
+            }
+        }
+
+        public static string AssemblyDirectory
+        {
+            get
+            {
+                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                UriBuilder uri = new UriBuilder(codeBase);
+                string path = Uri.UnescapeDataString(uri.Path);
+                return Path.GetDirectoryName(path);
             }
         }
 

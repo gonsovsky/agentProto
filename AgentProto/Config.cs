@@ -5,7 +5,7 @@
         public static readonly int GramSize = Helper.SizeOf(typeof(ProtoGram));
 
         /// <summary>
-        /// Размер буфера должен вмещать протограмму с URL
+        /// Buffer size must be equal or greater than "Gram" with URL
         /// </summary>
         public readonly int BufferSize = 1024;
 

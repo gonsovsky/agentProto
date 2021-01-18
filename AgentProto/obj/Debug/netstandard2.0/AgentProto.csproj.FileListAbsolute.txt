@@ -8,4 +8,3 @@ C:\SoftConsult\AgentProto\AgentProto\bin\Debug\netstandard2.0\Corallite.dll
 C:\SoftConsult\AgentProto\AgentProto\obj\Debug\netstandard2.0\AgentProto.csproj.CopyComplete
 C:\SoftConsult\AgentProto\AgentProto\obj\Debug\netstandard2.0\AgentProto.dll
 C:\SoftConsult\AgentProto\AgentProto\obj\Debug\netstandard2.0\AgentProto.pdb
-C:\SoftConsult\AgentProto\AgentProto\obj\Debug\netstandard2.0\AgentProto.csprojAssemblyReference.cache

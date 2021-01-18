@@ -3,8 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
+using Corallite.Buffers;
 
 namespace AgentProto
 {
@@ -83,15 +82,10 @@ namespace AgentProto
             try
             {
                 var bytesSent = state.WorkSocket.EndSend(ar);
-
-                if (state.File.Position - state.Gram.Start < state.FileLength)
-                {
+                if (state.HasSend())
                     Send(state);
-                }
                 else
-                {
                     Complete(state);
-                }
             }
             catch (Exception e)
             {   
@@ -99,7 +93,7 @@ namespace AgentProto
             }
         }
 
-        public Hub(Config config, Fs fs) : base(config, fs)
+        public Hub(Config config, IFs fs) : base(config, fs)
         {
         }
     }

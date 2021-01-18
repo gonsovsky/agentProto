@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Corallite.Buffers;
 
 namespace AgentProto
 {
@@ -35,7 +36,7 @@ namespace AgentProto
                 state.WorkSocket = client;
                 client.BeginConnect(remoteEp, ConnectCallback, state);
                 ConnectDone.WaitOne();
-                Send(state, state.Gram);
+                Send(state);
                 SendDone.WaitOne();
                 Receive(state);
                 AllDone.WaitOne();
@@ -66,7 +67,7 @@ namespace AgentProto
             }
         }
 
-        private void Send(AgentState state, ProtoGram gram)
+        private void Send(AgentState state)
         {
             state.Send();
             state.WorkSocket.BeginSend(state.Buffer, 0, state.BufferLen, 0,
@@ -131,8 +132,8 @@ namespace AgentProto
 
         public override void Abort(ProtoState state, Exception e)
         {
-            this.ConnectDone.Set();
-            this.SendDone.Set();
+            ConnectDone.Reset();
+            SendDone.Reset();
             base.Abort(state, e);
         }
     }
