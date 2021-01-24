@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace AgentProto
 {
@@ -42,7 +43,6 @@ namespace AgentProto
             }
         }
 
-        /*
         public static byte[] Serialize<T>(this T data)
             where T : struct
         {
@@ -50,20 +50,27 @@ namespace AgentProto
         }
 
         public static MemoryStream SerializeStream<T>(this T data)
-            where T : struct
+        
         {
             var formatter = new BinaryFormatter();
             var stream = new MemoryStream();
             formatter.Serialize(stream, data);
+            stream.Position = 0;
             return stream;
         }
 
         public static T Deserialize<T>(byte[] array)
-            where T : struct
         {
             var stream = new MemoryStream(array);
+            return DeserializeStream<T>(stream);
+        }
+
+        public static T DeserializeStream<T>(Stream stream)
+        
+        {
+            stream.Position = 0;
             var formatter = new BinaryFormatter();
             return (T)formatter.Deserialize(stream);
-        }*/
+        }
     }
 }

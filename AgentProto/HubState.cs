@@ -9,27 +9,54 @@ namespace AgentProto
             BufferLen += len;
             if (BufferLen < Config.GramSize)
                 return false;
+
             Gram = ProtoGram.FromByteArray(Buffer);
-            File = Fs.Get(Url, Gram.Start, Gram.Length);
-            FileLength = this.Gram.Length != 0 ? this.Gram.Length : File.Length - Gram.Start;
-      
+            if (RecvStream != null)
+                return false;
+            switch (Gram.Command)
+            {
+                case ProtoCommand.Get:
+                    RecvStream = Fs.Get(Url, Gram.Start, Gram.Length);
+                    break;
+                case ProtoCommand.List:
+                    var list = Fs.List(Url);
+                    RecvStream = list.SerializeStream();
+                    break;
+                case ProtoCommand.Head:
+                    var head = Fs.Head(Url);
+                    RecvStream = head.SerializeStream();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            FileLength = this.Gram.Length != 0 ? this.Gram.Length : RecvStream.Length - Gram.Start;
             return true;
+
         }
 
         public long FileLength;
 
         public bool HasSend()
         {
-            return File.Position - Gram.Start < FileLength;
+            return RecvStream.Position - Gram.Start < FileLength;
         }
 
         public override void Send()
         {
             BufferLen = 0;
             base.Send();
-            long size = Config.BufferSize - BufferLen;
-            size = Math.Min(FileLength - File.Position + Gram.Start, size);
-            BufferLen += File.Read(this.Buffer, BufferLen, (int)size);
+            if (Gram.Status == (byte) ProtoStatus.Success)
+            {
+                long size = Config.BufferSize - BufferLen;
+                size = Math.Min(FileLength - RecvStream.Position + Gram.Start, size);
+                BufferLen += RecvStream.Read(this.Buffer, BufferLen, (int) size);
+            }
+        }
+
+        public void SendError(Exception e)
+        {
+            Gram.Status = ProtoStatus.Error;
         }
 
         public HubState(Config config, IFs fs) : base(config, fs)

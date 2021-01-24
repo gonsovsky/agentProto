@@ -35,10 +35,12 @@ namespace AgentProto
             OnAbort?.Invoke(this, state, e);
         }
 
-        public virtual void Complete(ProtoState state)
+        public virtual object Complete(ProtoState state)
         {
-            state.Complete();
+            var res = state.Complete();
             OnResponse?.Invoke(this, state);
+            AllDone.Reset();
+            return res;
         }
     }
 }

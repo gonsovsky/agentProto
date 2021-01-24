@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Net.Sockets;
-using System.Text;
 using Corallite.Buffers;
 
 namespace AgentProto
@@ -23,27 +22,32 @@ namespace AgentProto
 
         public int BufferLen;
 
-        public Stream File;
+        public Stream RecvStream;
 
         public Socket WorkSocket;
 
         public ProtoGram Gram;
 
+        public object Result;
+
         public abstract bool Receive(int len);
 
-        public virtual void Complete()
+        public virtual object Complete()
         {
-            WorkSocket?.Shutdown(SocketShutdown.Both);
-            WorkSocket?.Close();
+            if (WorkSocket != null)
+            {
+                WorkSocket?.Shutdown(SocketShutdown.Both);
+                WorkSocket?.Close();
+            }
+
             WorkSocket = null;
             if (Buffer != null)
                 UniArrayPool<byte>.Shared.Return(Buffer);
             Buffer = null;
-            if (File != null)
-                Fs.Release(File);
-            File = null;
+            RecvStream = null;
             HeadRecv = false;
             HeadSent = false;
+            return Result;
         }
 
         public virtual void Abort(Exception e)
@@ -64,6 +68,6 @@ namespace AgentProto
             BufferLen = Gram.Size;
         }
 
-        public string Url => Encoding.UTF8.GetString(Gram.UrlData);
+        public string Url => Gram.Url;
     }
 }

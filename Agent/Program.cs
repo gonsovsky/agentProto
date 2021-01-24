@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using AgentProto;
 
 namespace Agent
@@ -9,13 +8,23 @@ namespace Agent
         private static void Main()
         {
             var agent = MakeAgent();
+
+            var list = agent.List("");
+            if (list != null)
+            {
+                foreach (var item in list)
+                    Console.WriteLine($"{item.Name} - {item.Size}");
+            }
+
+            var head = agent.Head("123.txt");
+
             agent.Get("123.txt", 0, 500000, "123-1.txt");
 
-            agent = MakeAgent();
             agent.Get("123.txt", 500000, 0, "123-2.txt");
 
             Helper.Combine(Helper.AssemblyDirectory,
-                new string[] {"123-1.txt", "123-2.txt"}, "123.txt");
+                new string[] { "123-1.txt", "123-2.txt" }, "123.txt");
+
             Console.ReadLine();
         }
 

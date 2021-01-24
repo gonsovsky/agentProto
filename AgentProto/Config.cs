@@ -13,6 +13,6 @@
 
         public string Host = "localhost";
 
-        public string RootFolder = @"C:\temp";
+        public string RootFolder = Helper.AssemblyDirectory;
     }
 }

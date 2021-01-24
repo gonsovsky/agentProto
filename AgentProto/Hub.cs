@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
-using Corallite.Buffers;
 
 namespace AgentProto
 {
@@ -56,7 +55,18 @@ namespace AgentProto
             var bytesRead = state.WorkSocket.EndReceive(ar);
             if (bytesRead <= 0)
                 return;
-            if (state.Receive(bytesRead))
+            bool recv;
+            try
+            {
+                recv = state.Receive(bytesRead);
+            }
+            catch (Exception e)
+            {
+                state.SendError(e);
+                recv = true;
+            }
+
+            if (recv)
             {
                 OnRequest?.Invoke(this, state);
                 Send(state);
@@ -81,11 +91,16 @@ namespace AgentProto
             var state = (HubState)ar.AsyncState;
             try
             {
-                var bytesSent = state.WorkSocket.EndSend(ar);
+                state.WorkSocket.EndSend(ar);
                 if (state.HasSend())
                     Send(state);
                 else
-                    Complete(state);
+                {
+                    if (state.Gram.Status == ProtoStatus.Success)
+                        Complete(state);
+                    else
+                        Abort(state,null);
+                }
             }
             catch (Exception e)
             {   

@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace AgentProto
 {
@@ -10,9 +10,11 @@ namespace AgentProto
         Stream Get(string uri, long start, long length);
         Stream Put(string filename);
         void Release(Stream fs);
-        IEnumerable<FsInfo> List(string dir);
+        FsInfo[] List(string dir);
+        FsInfo Head(string uri);
     }
 
+    [Serializable]
     public struct FsInfo
     {
         public string Name;
@@ -31,8 +33,8 @@ namespace AgentProto
         public Stream Get(string uri, long start, long length)
         {
             var file = Path.Combine(Config.RootFolder, uri);
-            FileStream stream = new FileStream(file, FileMode.Open, FileAccess.Read);
-            stream.Seek((long)start, SeekOrigin.Begin);
+            var stream = new FileStream(file, FileMode.Open, FileAccess.Read);
+            stream.Seek(start, SeekOrigin.Begin);
             return stream;
         }
 
@@ -48,16 +50,40 @@ namespace AgentProto
             fs?.Close();
         }
 
-        public IEnumerable<FsInfo> List(string dir)
+        public FsInfo[] List(string dir)
         {
-            var dirX = Path.Combine(Config.RootFolder, dir);
+            var dirX = PathX(dir);
             return Directory.GetFiles(dirX)
                 .Select(x => new FsInfo()
                 {
 
-                    Name = x,
+                    Name = Path.GetFileName(x),
                     Size = new FileInfo(Path.Combine(dirX, x)).Length
-                });
+                }).ToArray();
+        }
+
+        public FsInfo Head(string uri)
+        {
+            var dirX = PathX(uri);
+            return new FsInfo()
+            {
+                Name = uri,
+                Size = new FileInfo(dirX).Length
+            };
+        }
+
+        public string PathX(string uri)
+        {
+            while (true)
+            {
+                String newPath = new Regex(@"[^\\/]+(?<!\.\.)[\\/]\.\.[\\/]").Replace(uri, "");
+                if (newPath == uri) break;
+                uri = newPath;
+            }
+            uri = uri.Replace("/", Path.DirectorySeparatorChar.ToString());
+            uri = uri.Replace(@"\", Path.DirectorySeparatorChar.ToString());
+            var dirX = Path.Combine(Config.RootFolder, uri);
+            return dirX;
         }
     }
 
@@ -74,13 +100,12 @@ namespace AgentProto
 
         private static byte[] GetByteArray(int sizeInKb)
          {
-             Random rnd = new Random();
-             Byte[] b = new Byte[sizeInKb];
-             for (int i = 0; i < b.Length; i++)
+             var b = new byte[sizeInKb];
+             for (var i = 0; i < b.Length; i++)
              {
                 b[i] = 55;
              }
-            return b;
+             return b;
          }
 
         public Stream Get(string uri, long start, long length)
@@ -101,9 +126,14 @@ namespace AgentProto
             //fs?.Close();
         }
 
-        public IEnumerable<FsInfo> List(string dir)
+        public FsInfo[] List(string dir)
         {
-            throw new System.NotImplementedException();
+            return new[] { new FsInfo() {Name = "123.txt", Size = new FileInfo("123.txt").Length}};
+        }
+
+        public FsInfo Head(string uri)
+        {
+            return new FsInfo() {Name = "123.txt", Size = new FileInfo("123.txt").Length};
         }
     }
 

@@ -5,24 +5,35 @@ namespace AgentProto
 {
     public struct ProtoGram
     {
-        public byte Command;
-        public byte Status;
+        public ProtoCommand Command;
+        public ProtoStatus Status;
         public long Start;
         public long Length;
         public short UrlLength;
         public byte[] UrlData;
 
-        public ProtoGram(byte command, long start, long len, string uri)
+        public ProtoGram(ProtoCommand command, long start, long len, string uri)
         {
             Command = command;
             Start = start;
             Length = len;
             UrlLength = (short)uri.Length;
             UrlData = Encoding.UTF8.GetBytes(uri);
-            Status = 0;
+            Status = ProtoStatus.Success;
         }
 
         public int Size => Config.GramSize + UrlLength;
+
+        public string Url
+        {
+            get => Encoding.UTF8.GetString(UrlData);
+            set
+            {
+                UrlLength = (short)value.Length;
+                UrlData = Encoding.UTF8.GetBytes(value);
+            }
+        }
+
 
         public void ToByteArray(ref byte[] target)
         {
@@ -30,8 +41,8 @@ namespace AgentProto
             {
                 using (var writer = new BinaryWriter(ms))
                 {
-                    writer.Write(Command);
-                    writer.Write(Status);
+                    writer.Write((byte)Command);
+                    writer.Write((byte)Status);
                     writer.Write(Start);
                     writer.Write(Length);
                     writer.Write(UrlLength);
@@ -46,8 +57,8 @@ namespace AgentProto
             {
                 var res = new ProtoGram
                 {
-                    Command = reader.ReadByte(),
-                    Status = reader.ReadByte(),
+                    Command = (ProtoCommand) reader.ReadByte(),
+                    Status = (ProtoStatus) reader.ReadByte(),
                     Start = reader.ReadInt64(),
                     Length = reader.ReadInt64(),
                     UrlLength = reader.ReadInt16()
@@ -58,13 +69,14 @@ namespace AgentProto
         }
     }
 
-    public enum ProtoCommand
+    public enum ProtoCommand: byte
     {
         Get = 0x1,
-        List = 0x2
+        List = 0x2,
+        Head = 0x3
     }
 
-    public enum ProtoStatus
+    public enum ProtoStatus: byte
     {
         Success = 0x0,
         Error = 0x1

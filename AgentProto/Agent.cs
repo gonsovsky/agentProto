@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using Corallite.Buffers;
 
 namespace AgentProto
 {
@@ -16,14 +14,14 @@ namespace AgentProto
         protected readonly ManualResetEvent SendDone =
             new ManualResetEvent(false);
 
-        public void Get(string uri, long start, long len, string file="")
+        public object Cmd(ProtoCommand cmd, string uri, long start, long len, string file = "")
         {
             if (file == "")
                 file = uri;
             var state = new AgentState(Config, Fs)
             {
                 FileName = file,
-                Gram = new ProtoGram((byte)ProtoCommand.Get, start, len, uri)
+                Gram = new ProtoGram(cmd, start, len, uri)
             };
             try
             {
@@ -40,17 +38,38 @@ namespace AgentProto
                 SendDone.WaitOne();
                 Receive(state);
                 AllDone.WaitOne();
-                Complete(state);
+                if (state.Gram.Status == ProtoStatus.Success )
+                    return Complete(state);
+                else
+                {
+                    throw new ApplicationException(state.Url);
+                }
             }
             catch (Exception e)
             {
                 Abort(state, e);
+                return null;
             }
         }
 
-        public List<FsInfo> List(string uri)
+        public bool Get(string uri, long start, long len, string file="")
+        {   
+            var obj = Cmd(ProtoCommand.Get, uri, start, len, file);
+            if (obj!=null)
+                return (bool) obj;
+            return false;
+        }
+
+        public FsInfo[] List(string uri)
         {
-            return null;
+            var obj = Cmd(ProtoCommand.List, uri, 0, 0, null);
+            return (FsInfo[]) obj;
+        }
+
+        public FsInfo Head(string uri)
+        {
+            var obj = Cmd(ProtoCommand.Head, uri, 0, 0, null);
+            return (FsInfo) obj;
         }
 
         private void ConnectCallback(IAsyncResult ar)
@@ -79,7 +98,7 @@ namespace AgentProto
             var state = (AgentState)ar.AsyncState;
             try
             {
-                var bytesSent = state.WorkSocket.EndSend(ar);
+                state.WorkSocket.EndSend(ar);
                 SendDone.Set();
                 OnRequest?.Invoke(this, state);
             }
@@ -135,6 +154,13 @@ namespace AgentProto
             ConnectDone.Reset();
             SendDone.Reset();
             base.Abort(state, e);
+        }
+
+        public override object Complete(ProtoState state)
+        {
+            ConnectDone.Reset();
+            SendDone.Reset();
+            return base.Complete(state);
         }
     }
 }
